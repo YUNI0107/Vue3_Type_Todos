@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref } from "vue"
+import { provide, ref, computed } from "vue"
 
 // components
 import AddTodoSection from "@/components/layout/AddTodoSection/AddTodoSection.vue"
@@ -11,7 +11,12 @@ import type { ITodoItem } from "@/types/others"
 // data
 import { todoDefaultList } from "@/data/todoDefaultList"
 
+// icon
+import { CaretTop } from "@element-plus/icons-vue"
+
+// state
 const todoList = ref(todoDefaultList)
+const isDesc = ref(true)
 
 // operation
 const addTodo = (newItem: ITodoItem) => {
@@ -26,8 +31,14 @@ const deleteTodo = (index: number) => {
   todoList.value.splice(index, 1)
 }
 
+const todoDateList = computed(() => {
+  return todoList.value.sort((a, b) => {
+    return a.timeStamp - b.timeStamp
+  })
+})
+
 provide("todoList", {
-  todoList: todoList.value,
+  todoList: todoDateList,
   addTodo,
   reviseTodo,
   deleteTodo,
@@ -44,7 +55,14 @@ provide("todoList", {
       <AddTodoSection />
     </div>
 
-    <TodoListSection />
+    <div class="todo-section">
+      <div class="sort-section">
+        <p>Sort By Date</p>
+        <el-icon color="#fff"><caret-top /></el-icon>
+      </div>
+      <h1 v-if="todoList.length === 0">無代辦事項</h1>
+      <TodoListSection v-else />
+    </div>
   </el-container>
 </template>
 
@@ -60,6 +78,7 @@ provide("todoList", {
   color: #fff;
   font-family: "Poppins", sans-serif;
   font-size: 16px;
+  flex-direction: column;
 }
 
 .title {
@@ -70,5 +89,21 @@ provide("todoList", {
 
 .title-group {
   align-items: baseline;
+}
+
+.todo-section {
+  padding: 20px 0;
+}
+
+.sort-section {
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.sort-section p {
+  margin-right: 4px;
+  font-size: 12px;
 }
 </style>

@@ -10,6 +10,9 @@ import type { ITodoItem } from "@/types/others"
 // utils
 import getDate from "@/utils/getDate"
 
+// icon
+import { Edit, DeleteFilled } from "@element-plus/icons-vue"
+
 const props = defineProps<{
   item: ITodoItem
   index: number
@@ -41,29 +44,35 @@ const reviseTodoCheck = (item: ITodoItem) => {
 </script>
 
 <template>
-  <div>
-    <div v-if="!isEditing">
+  <div class="todo-item" :class="item.isDone && 'done'">
+    <div v-if="!isEditing" class="show-item">
       <div class="date-block">
-        <h2>{{ date.month }}.</h2>
-        <p>{{ date.day }}</p>
-      </div>
-
-      <div>
         <div>
+          <p>{{ date.month }}.</p>
+          <h2>{{ date.day }}</h2>
+        </div>
+        <p class="week">{{ date.week }}</p>
+      </div>
+      <div class="content-block">
+        <div class="content-info">
           <button @click="reviseTodoCheck({ ...item, isDone: !item.isDone })">
-            {{ item.isDone ? "完成" : "未完成" }}
+            <div class="ball" :class="{ done: item.isDone }"></div>
           </button>
           <p>{{ item.content }}</p>
         </div>
 
-        <div>
-          <button @click="handleMode(true)">編輯</button>
-          <button @click="deleteTodo(props.index)">刪除</button>
+        <div class="content-tool">
+          <button class="button" @click="handleMode(true)">
+            <el-icon color="#fff"><edit /></el-icon>
+          </button>
+          <button class="button" @click="deleteTodo(props.index)">
+            <el-icon color="#fff"><delete-filled /></el-icon>
+          </button>
         </div>
       </div>
     </div>
 
-    <div v-else>
+    <div class="input-block" v-else>
       <Input
         mode="reviseMode"
         placeholder="Edit the Todo"
@@ -77,9 +86,96 @@ const reviseTodoCheck = (item: ITodoItem) => {
 </template>
 
 <style scoped>
+.todo-item {
+  width: 100%;
+  border: solid 1px #fff;
+  margin: 16px 0;
+}
+.todo-item.done {
+  opacity: 0.25;
+}
+
+.show-item {
+  display: flex;
+  width: 100%;
+}
+
 .date-block {
   background-color: var(--theme-red);
   width: 60px;
-  height: 60px;
+  min-width: 60px;
+  min-height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.date-block h2 {
+  font-weight: 800;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 28px;
+}
+
+.date-block p {
+  display: inline-block;
+  line-height: 18px;
+}
+.date-block .week {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.content-block {
+  flex: 1;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.content-block .content-info {
+  display: flex;
+  align-items: center;
+}
+
+.content-block .content-info p {
+  margin-left: 20px;
+}
+
+.content-block .content-info button {
+  background: none;
+  outline: none;
+  border: none;
+}
+.content-block .content-info .ball {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: black;
+  border: solid 1px #fff;
+  cursor: pointer;
+}
+
+.content-block .content-info .ball.done::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.content-tool {
+  display: flex;
+}
+
+.input-block {
+  padding: 10px 12px;
 }
 </style>

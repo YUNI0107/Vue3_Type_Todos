@@ -56,9 +56,9 @@ watch(
 </script>
 
 <template>
-  <el-row>
-    <el-col :span="23">
-      <div class="input-section">
+  <div class="input-container">
+    <div class="input-section">
+      <div class="selection">
         <el-date-picker
           v-model="dateValue"
           type="date"
@@ -83,24 +83,39 @@ watch(
           type="text"
           v-model="inputValue"
           :placeholder="placeholder"
+          :class="{ revise: mode === 'reviseMode' }"
         />
       </div>
       <p class="warn-text" v-if="isWarnShow">日期或代辦事項不得為空</p>
-    </el-col>
+    </div>
 
-    <el-col :span="1">
+    <div class="tools">
       <button class="button" @click="reviseTodoCheck">
-        <el-icon><circle-check-filled /></el-icon>
+        <el-icon :color="mode === 'reviseMode' && '#2ecc71'"
+          ><circle-check-filled
+        /></el-icon>
       </button>
-      <button v-if="mode === 'reviseMode'" @click="$emit('cancelEdit')">
-        <el-icon><circle-close-filled /></el-icon>
+      <button
+        class="button"
+        v-if="mode === 'reviseMode'"
+        @click="$emit('cancelEdit')"
+      >
+        <el-icon :color="mode === 'reviseMode' && '#e74c3c'"
+          ><circle-close-filled
+        /></el-icon>
       </button>
-    </el-col>
-  </el-row>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+.input-container {
+  display: flex;
+}
 .input-section {
+  flex: 1;
+}
+.selection {
   display: flex;
 }
 .text-input {
@@ -108,6 +123,17 @@ watch(
   border: none;
   outline: none;
   padding: 10px 20px;
+}
+.text-input.revise {
+  background: black;
+  color: #fff;
+  margin-left: 12px;
+  border-radius: 5px;
+  flex: 1;
+}
+
+.text-input.revise:focus {
+  border: solid 1px #eee;
 }
 .cell {
   height: 30px;
@@ -139,5 +165,9 @@ watch(
   color: var(--theme-red);
   font-size: 12px;
   padding-top: 10px;
+}
+
+.tools {
+  display: flex;
 }
 </style>

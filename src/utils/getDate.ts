@@ -1,3 +1,5 @@
+import getWeekDay from "@/utils/getWeekDay"
+
 function getDate(timeStamp: number) {
   const day = new Date(timeStamp)
 
@@ -8,7 +10,11 @@ function getDate(timeStamp: number) {
     return {}
   }
 
-  return { month: day.getMonth() + 1, day: day.getDate() }
+  return {
+    month: day.getMonth() + 1,
+    day: day.getDate(),
+    week: getWeekDay(day.getDay()),
+  }
 }
 
 export default getDate
