@@ -1,0 +1,143 @@
+<script setup lang="ts">
+import { ref, watch } from "vue"
+
+// types
+import type { ITodoItem, IInputMode } from "@/types/others"
+
+// icons
+import { CircleCheckFilled, CircleCloseFilled } from "@element-plus/icons-vue"
+
+const props = defineProps<{
+  mode: IInputMode
+  placeholder: string
+  initialValue?: string
+  initialDateTimestamp?: number
+}>()
+
+const emit = defineEmits<{
+  (e: "reviseTodo", item: ITodoItem): void
+  (e: "cancelEdit"): void
+}>()
+
+// refs
+const inputValue = ref(props.initialValue)
+const dateValue = ref(props.initialDateTimestamp)
+const isWarnShow = ref(false)
+
+// operation
+const disabledDate = (time: Date) => {
+  const today = new Date()
+  return time.getTime() < today.setDate(today.getDate() - 1)
+}
+
+const reviseTodoCheck = () => {
+  if (inputValue.value && dateValue.value) {
+    emit("reviseTodo", {
+      content: inputValue.value,
+      timeStamp: dateValue.value,
+      isDone: false,
+    })
+
+    inputValue.value = ""
+    dateValue.value = undefined
+  } else {
+    isWarnShow.value = true
+  }
+}
+
+watch(
+  [() => inputValue.value, () => dateValue.value],
+  ([newInputValue, newDateValue]) => {
+    if (newInputValue && newDateValue) {
+      isWarnShow.value = false
+    }
+  }
+)
+</script>
+
+<template>
+  <el-row>
+    <el-col :span="23">
+      <div class="input-section">
+        <el-date-picker
+          v-model="dateValue"
+          type="date"
+          placeholder="Pick a day"
+          :disabled-date="disabledDate"
+          format="YYYY/MM/DD"
+          value-format="x"
+          size="large"
+          popper-class="date-picker"
+        >
+          <template #default="cell">
+            <div
+              class="cell"
+              :class="{ current: cell.isCurrent, disabled: cell.disabled }"
+            >
+              <span class="text">{{ cell.text }}</span>
+            </div>
+          </template>
+        </el-date-picker>
+        <input
+          class="text-input"
+          type="text"
+          v-model="inputValue"
+          :placeholder="placeholder"
+        />
+      </div>
+      <p class="warn-text" v-if="isWarnShow">日期或代辦事項不得為空</p>
+    </el-col>
+
+    <el-col :span="1">
+      <button class="button" @click="reviseTodoCheck">
+        <el-icon><circle-check-filled /></el-icon>
+      </button>
+      <button v-if="mode === 'reviseMode'" @click="$emit('cancelEdit')">
+        <el-icon><circle-close-filled /></el-icon>
+      </button>
+    </el-col>
+  </el-row>
+</template>
+
+<style scoped>
+.input-section {
+  display: flex;
+}
+.text-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 20px;
+}
+.cell {
+  height: 30px;
+  padding: 3px 0;
+  box-sizing: border-box;
+}
+.cell .text {
+  width: 24px;
+  height: 24px;
+  display: block;
+  margin: 0 auto;
+  line-height: 24px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+}
+.cell.current .text {
+  background: var(--theme-red);
+  color: #fff;
+}
+.cell.disabled .text {
+  cursor: not-allowed;
+  color: #fff;
+  background-color: #eee;
+}
+
+.warn-text {
+  color: var(--theme-red);
+  font-size: 12px;
+  padding-top: 10px;
+}
+</style>
