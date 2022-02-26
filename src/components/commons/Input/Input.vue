@@ -1,23 +1,30 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, inject, type Ref } from 'vue'
 
 // types
-import type { ITodoItem, IInputMode } from "@/types/others"
+import type { ITodoItem, IInputMode } from '@/types/others'
 
 // icons
-import { CircleCheckFilled, CircleCloseFilled } from "@element-plus/icons-vue"
+import { CircleCheckFilled, CircleCloseFilled } from '@element-plus/icons-vue'
 
 const props = defineProps<{
   mode: IInputMode
   placeholder: string
   initialValue?: string
   initialDateTimestamp?: number
+  key?: string
 }>()
 
 const emit = defineEmits<{
-  (e: "reviseTodo", item: ITodoItem): void
-  (e: "cancelEdit"): void
+  (e: 'reviseTodo', item: ITodoItem): void
+  (e: 'cancelEdit'): void
 }>()
+
+// injects
+const { addKeyCount, keyCount } = inject('todoList') as {
+  addKeyCount: () => void
+  keyCount: Ref<number>
+}
 
 // refs
 const inputValue = ref(props.initialValue)
@@ -32,13 +39,15 @@ const disabledDate = (time: Date) => {
 
 const reviseTodoCheck = () => {
   if (inputValue.value && dateValue.value) {
-    emit("reviseTodo", {
+    emit('reviseTodo', {
+      key: props.key ? props.key : `key-${keyCount.value}`,
       content: inputValue.value,
       timeStamp: dateValue.value,
       isDone: false,
     })
 
-    inputValue.value = ""
+    if (!props.key) addKeyCount()
+    inputValue.value = ''
     dateValue.value = undefined
   } else {
     isWarnShow.value = true
@@ -84,6 +93,7 @@ watch(
           v-model="inputValue"
           :placeholder="placeholder"
           :class="{ revise: mode === 'reviseMode' }"
+          @keydown.enter="reviseTodoCheck"
         />
       </div>
       <p class="warn-text" v-if="isWarnShow">日期或代辦事項不得為空</p>
@@ -91,7 +101,7 @@ watch(
 
     <div class="tools">
       <button class="button" @click="reviseTodoCheck">
-        <el-icon :color="mode === 'reviseMode' && '#2ecc71'"
+        <el-icon :color="mode === 'reviseMode' ? '#2ecc71' : ''"
           ><circle-check-filled
         /></el-icon>
       </button>
@@ -100,7 +110,7 @@ watch(
         v-if="mode === 'reviseMode'"
         @click="$emit('cancelEdit')"
       >
-        <el-icon :color="mode === 'reviseMode' && '#e74c3c'"
+        <el-icon :color="mode === 'reviseMode' ? '#e74c3c' : ''"
           ><circle-close-filled
         /></el-icon>
       </button>

@@ -1,27 +1,26 @@
 <script setup lang="ts">
-import { ref, inject, computed } from "vue"
+import { ref, inject, computed } from 'vue'
 
 // components
-import Input from "@/components/commons/Input/Input.vue"
+import Input from '@/components/commons/Input/Input.vue'
 
 // types
-import type { ITodoItem } from "@/types/others"
+import type { ITodoItem } from '@/types/others'
 
 // utils
-import getDate from "@/utils/getDate"
+import getDate from '@/utils/getDate'
 
 // icon
-import { Edit, DeleteFilled } from "@element-plus/icons-vue"
+import { Edit, DeleteFilled } from '@element-plus/icons-vue'
 
 const props = defineProps<{
   item: ITodoItem
-  index: number
 }>()
 
 // inject
-const { reviseTodo, deleteTodo } = inject("todoList") as {
-  reviseTodo: (reviseItem: ITodoItem, index: number) => void
-  deleteTodo: (index: number) => void
+const { reviseTodo, deleteTodo } = inject('todoList') as {
+  reviseTodo: (reviseItem: ITodoItem, index: string) => void
+  deleteTodo: (key: string) => void
 }
 
 // state
@@ -38,7 +37,7 @@ const handleMode = (isStartEdit: boolean) => {
 }
 
 const reviseTodoCheck = (item: ITodoItem) => {
-  reviseTodo(item, props.index)
+  reviseTodo(item, props.item.key)
   handleMode(false)
 }
 </script>
@@ -62,10 +61,10 @@ const reviseTodoCheck = (item: ITodoItem) => {
         </div>
 
         <div class="content-tool">
-          <button class="button" @click="handleMode(true)">
+          <button class="button" @click="handleMode(true)" v-if="!item.isDone">
             <el-icon color="#fff"><edit /></el-icon>
           </button>
-          <button class="button" @click="deleteTodo(props.index)">
+          <button class="button" @click="deleteTodo(props.item.key)">
             <el-icon color="#fff"><delete-filled /></el-icon>
           </button>
         </div>
@@ -78,6 +77,7 @@ const reviseTodoCheck = (item: ITodoItem) => {
         placeholder="Edit the Todo"
         :initial-value="item.content"
         :initial-date-timestamp="item.timeStamp"
+        :key="item.key"
         @reviseTodo="reviseTodoCheck"
         @cancelEdit="handleMode(false)"
       />
@@ -160,7 +160,7 @@ const reviseTodoCheck = (item: ITodoItem) => {
 }
 
 .content-block .content-info .ball.done::before {
-  content: "";
+  content: '';
   width: 20px;
   height: 20px;
   background-color: #fff;

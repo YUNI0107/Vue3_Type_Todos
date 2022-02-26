@@ -1,47 +1,70 @@
 <script setup lang="ts">
-import { provide, ref, computed } from "vue"
+import { provide, ref, computed } from 'vue'
 
 // components
-import AddTodoSection from "@/components/layout/AddTodoSection/AddTodoSection.vue"
-import TodoListSection from "./components/layout/TodoListSection/TodoListSection.vue"
+import AddTodoSection from '@/components/layout/AddTodoSection/AddTodoSection.vue'
+import TodoListSection from './components/layout/TodoListSection/TodoListSection.vue'
 
 // types
-import type { ITodoItem } from "@/types/others"
+import type { ITodoItem } from '@/types/others'
 
 // data
-import { todoDefaultList } from "@/data/todoDefaultList"
+import { todoDefaultList } from '@/data/todoDefaultList'
 
 // icon
-import { CaretTop } from "@element-plus/icons-vue"
+import { CaretTop } from '@element-plus/icons-vue'
 
 // state
 const todoList = ref(todoDefaultList)
+const keyCount = ref(1)
 const isDesc = ref(true)
 
 // operation
 const addTodo = (newItem: ITodoItem) => {
+  console.log(newItem)
+
   todoList.value.push(newItem)
 }
 
-const reviseTodo = (reviseItem: ITodoItem, index: number) => {
+const reviseTodo = (reviseItem: ITodoItem, key: string) => {
+  console.log(key)
+
+  const index = todoList.value.findIndex((item) => item.key === key)
   todoList.value.splice(index, 1, reviseItem)
 }
 
-const deleteTodo = (index: number) => {
+const deleteTodo = (key: string) => {
+  const index = todoList.value.findIndex((item) => item.key === key)
   todoList.value.splice(index, 1)
 }
 
+const addKeyCount = () => {
+  keyCount.value++
+}
+
 const todoDateList = computed(() => {
-  return todoList.value.sort((a, b) => {
-    return a.timeStamp - b.timeStamp
+  const undoneList = todoList.value.filter((item) => {
+    return item.isDone === false
   })
+
+  const sortedUndoneList = undoneList.sort((a, b) => {
+    return isDesc.value ? a.timeStamp - b.timeStamp : b.timeStamp - a.timeStamp
+  })
+
+  const doneList = todoList.value.filter((item) => {
+    return item.isDone
+  })
+
+  return [...sortedUndoneList, ...doneList]
 })
 
-provide("todoList", {
+provide('todoList', {
   todoList: todoDateList,
+  keyCount,
   addTodo,
   reviseTodo,
   deleteTodo,
+  addKeyCount,
 })
 </script>
 
@@ -56,10 +79,11 @@ provide("todoList", {
     </div>
 
     <div class="todo-section">
-      <div class="sort-section">
+      <div class="sort-section" @click="isDesc = !isDesc">
         <p>Sort By Date</p>
-        <el-icon color="#fff"><caret-top /></el-icon>
+        <el-icon color="#fff" :class="{ desc: isDesc }"><caret-top /></el-icon>
       </div>
+
       <h1 v-if="todoList.length === 0">無代辦事項</h1>
       <TodoListSection v-else />
     </div>
@@ -67,8 +91,8 @@ provide("todoList", {
 </template>
 
 <style>
-@import "./assets/base.css";
-@import url("https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Poppins:wght@300;800&display=swap");
+@import './assets/base.css';
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Poppins:wght@300;800&display=swap');
 
 .el-container {
   background-color: var(--theme-dark-black);
@@ -76,7 +100,7 @@ provide("todoList", {
   width: 100vw;
   padding: 80px 50px;
   color: #fff;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 16px;
   flex-direction: column;
 }
@@ -100,10 +124,15 @@ provide("todoList", {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  cursor: pointer;
 }
 
 .sort-section p {
   margin-right: 4px;
   font-size: 12px;
+}
+
+.desc {
+  transform: rotate(180deg);
 }
 </style>
