@@ -22,6 +22,9 @@ const { reviseTodo, deleteTodo } = inject('todoList') as {
   reviseTodo: (reviseItem: ITodoItem, index: string) => void
   deleteTodo: (key: string) => void
 }
+const { openDialogCheck } = inject('dialog') as {
+  openDialogCheck: (callback: Function) => void
+}
 
 // state
 const isEditing = ref(false)
@@ -39,6 +42,10 @@ const handleMode = (isStartEdit: boolean) => {
 const reviseTodoCheck = (item: ITodoItem) => {
   reviseTodo(item, props.item.key)
   handleMode(false)
+}
+
+const deleteTodoCheck = (key: string) => {
+  openDialogCheck(() => deleteTodo(key))
 }
 </script>
 
@@ -64,7 +71,7 @@ const reviseTodoCheck = (item: ITodoItem) => {
           <button class="button" @click="handleMode(true)" v-if="!item.isDone">
             <el-icon color="#fff"><edit /></el-icon>
           </button>
-          <button class="button" @click="deleteTodo(props.item.key)">
+          <button class="button" @click="deleteTodoCheck(props.item.key)">
             <el-icon color="#fff"><delete-filled /></el-icon>
           </button>
         </div>

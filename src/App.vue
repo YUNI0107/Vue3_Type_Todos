@@ -4,6 +4,7 @@ import { provide, ref, computed } from 'vue'
 // components
 import AddTodoSection from '@/components/layout/AddTodoSection/AddTodoSection.vue'
 import TodoListSection from './components/layout/TodoListSection/TodoListSection.vue'
+import Dialog from './components/commons/Dialog/Dialog.vue'
 
 // types
 import type { ITodoItem } from '@/types/others'
@@ -18,30 +19,10 @@ import { CaretTop } from '@element-plus/icons-vue'
 const todoList = ref(todoDefaultList)
 const keyCount = ref(1)
 const isDesc = ref(true)
+const dialogVisible = ref(false)
+const dialogCallback = ref()
 
-// operation
-const addTodo = (newItem: ITodoItem) => {
-  console.log(newItem)
-
-  todoList.value.push(newItem)
-}
-
-const reviseTodo = (reviseItem: ITodoItem, key: string) => {
-  console.log(key)
-
-  const index = todoList.value.findIndex((item) => item.key === key)
-  todoList.value.splice(index, 1, reviseItem)
-}
-
-const deleteTodo = (key: string) => {
-  const index = todoList.value.findIndex((item) => item.key === key)
-  todoList.value.splice(index, 1)
-}
-
-const addKeyCount = () => {
-  keyCount.value++
-}
-
+// computed
 const todoDateList = computed(() => {
   const undoneList = todoList.value.filter((item) => {
     return item.isDone === false
@@ -58,6 +39,34 @@ const todoDateList = computed(() => {
   return [...sortedUndoneList, ...doneList]
 })
 
+// operation
+const addTodo = (newItem: ITodoItem) => {
+  todoList.value.push(newItem)
+}
+
+const reviseTodo = (reviseItem: ITodoItem, key: string) => {
+  const index = todoList.value.findIndex((item) => item.key === key)
+  todoList.value.splice(index, 1, reviseItem)
+}
+
+const deleteTodo = (key: string) => {
+  const index = todoList.value.findIndex((item) => item.key === key)
+  todoList.value.splice(index, 1)
+}
+
+const addKeyCount = () => {
+  keyCount.value++
+}
+
+const handleDialog = (isShow: boolean) => {
+  dialogVisible.value = isShow
+}
+
+const openDialogCheck = (callback: Function) => {
+  handleDialog(true)
+  dialogCallback.value = callback
+}
+
 provide('todoList', {
   todoList: todoDateList,
   keyCount,
@@ -66,9 +75,16 @@ provide('todoList', {
   deleteTodo,
   addKeyCount,
 })
+
+provide('dialog', {
+  dialogVisible,
+  openDialogCheck,
+  handleDialog,
+})
 </script>
 
 <template>
+  <Dialog @confirmCallback="dialogCallback" />
   <el-container>
     <div>
       <el-row class="title-group">

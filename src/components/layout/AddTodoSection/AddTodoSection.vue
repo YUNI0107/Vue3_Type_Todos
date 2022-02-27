@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { inject } from "vue"
+import { inject } from 'vue'
 
 // components
-import InputSection from "@/components/commons/Input/Input.vue"
+import InputSection from '@/components/commons/Input/Input.vue'
 
 // types
-import type { ITodoItem } from "@/types/others"
+import type { ITodoItem } from '@/types/others'
 
 // state
-const { addTodo } = inject("todoList") as {
+const { addTodo } = inject('todoList') as {
   addTodo: (newItem: ITodoItem) => void
 }
 </script>
