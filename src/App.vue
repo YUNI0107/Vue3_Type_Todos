@@ -68,7 +68,6 @@ provide("todoList", {
 
 <style>
 @import "./assets/base.css";
-@import url("https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Poppins:wght@300;800&display=swap");
 
 .el-container {
   background-color: var(--theme-dark-black);
