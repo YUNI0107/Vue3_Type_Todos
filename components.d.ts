@@ -5,9 +5,12 @@
 declare module 'vue' {
   export interface GlobalComponents {
     AddTodoSection: typeof import('./src/components/layout/AddTodoSection/AddTodoSection.vue')['default']
+    Dialog: typeof import('./src/components/commons/Dialog/Dialog.vue')['default']
+    ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
+    ElDialog: typeof import('element-plus/es')['ElDialog']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElRow: typeof import('element-plus/es')['ElRow']
     Input: typeof import('./src/components/commons/Input/Input.vue')['default']
